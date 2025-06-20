@@ -1,0 +1,151 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #00416A, #E4E5E6);
+    color: #333;
+}
+
+.login-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.login-box {
+    background-color: #ffffffdd;
+    padding: 2rem 3rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    text-align: center;
+    width: 350px;
+}
+
+.login-box h2 {
+    margin-bottom: 1rem;
+    color: #00416A;
+}
+
+.login-box .highlight {
+    color: #ff6600;
+}
+
+.login-box form {
+    margin-top: 1rem;
+}
+
+.login-box form p {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.login-box input[type="text"],
+.login-box input[type="password"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 0.7rem;
+    background-color: #00416A;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-box button:hover {
+    background-color: #003153;
+}
+
+.note {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 2rem 3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.dashboard-links {
+    list-style: none;
+    padding: 0;
+    margin-top: 2rem;
+}
+
+.dashboard-links li {
+    margin: 1rem 0;
+}
+
+.dashboard-links a {
+    text-decoration: none;
+    color: #00416A;
+    font-weight: bold;
+    background: #f0f0f0;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    transition: 0.3s ease;
+}
+
+.dashboard-links a:hover {
+    background: #00416A;
+    color: #fff;
+}
+
+.admin-badge {
+    color: #e67e22;
+}
+
+/* Game grid styles */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(20, minmax(20px, 1fr));
+    grid-template-rows: repeat(20, minmax(20px, 1fr));
+    gap: 1px;
+    justify-content: center;
+    margin: 20px auto;
+    border: 2px solid #00416A;
+    min-width: 400px;
+    min-height: 400px;
+    max-width: 100vw;
+    max-height: 70vw;
+    background: #e9ecef;
+    box-sizing: border-box;
+}
+.cell {
+    width: 20px;
+    height: 20px;
+    padding:5px;
+    border: 1px solid #ccc;
+    background: #f8f9fa;
+    display: inline-block;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+.cell.start {
+    background: #4caf50 !important;
+}
+.cell.goal {
+    background: #f44336 !important;
+}
+.cell.obstacle {
+    background: #333 !important;
+}
+.cell.path {
+    background: #ffeb3b !important;
+}
+#instructions {
+    font-size: 1rem;
+    margin-top: 1rem;
+}
