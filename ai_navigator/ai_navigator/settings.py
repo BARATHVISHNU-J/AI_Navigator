@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'ai_navigator.wsgi.application'
 # DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/DBNAME
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL", "postgresql://USER:PASSWORD@localhost:5432/DBNAME"),
+        default=os.environ.get("DATABASE_URL", 'postgresql://USER:PASSWORD@localhost:5432/DBNAME'),
         conn_max_age=600,
         ssl_require=True if not DEBUG else False
     )
