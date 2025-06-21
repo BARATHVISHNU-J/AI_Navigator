@@ -18,11 +18,13 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-fallback-dev-key')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -74,18 +76,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ai_navigator.wsgi.application'
 
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-# Ensure your .env DATABASE_URL uses the format:
-# DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/DBNAME
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL", "postgresql://USER:PASSWORD@localhost:5432/DBNAME"),
-        conn_max_age=600,
-        ssl_require=True if not DEBUG else False
-    )
+   'default': dj_database_url.config(default=os.environ.get("DATABASE_URL"))
 }
-# If you see connection issues, check your .env for correct PostgreSQL credentials and port (5432).
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -105,6 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -116,6 +113,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -123,6 +121,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "game" / "static"]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -136,6 +135,8 @@ INSTALLED_APPS += [
 AUTH_USER_MODEL = 'game.CustomUser'
 
 TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'game', 'templates')]
+
+# settings.py
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'  # Optional: where to go after successful login
