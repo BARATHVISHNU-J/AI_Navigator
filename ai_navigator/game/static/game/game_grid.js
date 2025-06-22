@@ -113,6 +113,13 @@ function clearGrid() {
     startCell = null;
     goalCell = null;
     mode = 'start';
+    astarPath = [];
+    dijkstraPath = [];
+    // Remove all path-related classes from the grid
+    const cells = document.querySelectorAll('.grid-cell-btn');
+    cells.forEach(cell => {
+        cell.classList.remove('path-astar', 'path-dijkstra', 'path-both');
+    });
     renderGrid();
 }
 

@@ -54,9 +54,16 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ('username', 'password1', 'password2')
 
 class AdminRegistrationForm(UserCreationForm):
+    admin_key = forms.CharField(label="Admin Key", widget=forms.PasswordInput)
     class Meta:
         model = User
-        fields = ('username', 'password1', 'password2')
+        fields = ('username', 'password1', 'password2', 'admin_key')
+
+    def clean_admin_key(self):
+        key = self.cleaned_data.get('admin_key')
+        if key != "AINAVIGATOR2025":
+            raise forms.ValidationError("Invalid admin key.")
+        return key
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -122,8 +129,15 @@ def run_astar(request):
         COLS = len(grid[0])
         obstacles = {(r, c) for r in range(ROWS) for c in range(COLS) if grid[r][c] == 'obstacle'}
 
-        start = Node(start_row, start_col)
-        goal = Node(goal_row, goal_col)
+        # Use a dict to store and reuse Node objects
+        node_map = {}
+        def get_node(row, col):
+            if (row, col) not in node_map:
+                node_map[(row, col)] = Node(row, col)
+            return node_map[(row, col)]
+
+        start = get_node(start_row, start_col)
+        goal = get_node(goal_row, goal_col)
         start.g = 0
         start.f = heuristic(start, goal)
 
@@ -141,17 +155,18 @@ def run_astar(request):
 
             visited.add((current.row, current.col))
             for neighbor in get_neighbors(current, grid, ROWS, COLS, obstacles):
-                if (neighbor.row, neighbor.col) in visited:
+                n = get_node(neighbor.row, neighbor.col)
+                if (n.row, n.col) in visited:
                     continue
                 temp_g = current.g + 1
-                if temp_g < neighbor.g:
-                    neighbor.g = temp_g
-                    neighbor.f = temp_g + heuristic(neighbor, goal)
-                    neighbor.parent = current
-                    heapq.heappush(open_set, (neighbor.f, neighbor))
+                if temp_g < n.g:
+                    n.g = temp_g
+                    n.f = temp_g + heuristic(n, goal)
+                    n.parent = current
+                    heapq.heappush(open_set, (n.f, n))
 
         if found:
-            path = reconstruct_path(current)
+            path = reconstruct_path(goal)
             AStarPath.objects.create(
                 user=request.user,
                 start_row=start_row, start_col=start_col,
@@ -177,8 +192,15 @@ def run_dijkstra(request):
         COLS = len(grid[0])
         obstacles = {(r, c) for r in range(ROWS) for c in range(COLS) if grid[r][c] == 'obstacle'}
 
-        start = Node(start_row, start_col)
-        goal = Node(goal_row, goal_col)
+        # Use a dict to store and reuse Node objects
+        node_map = {}
+        def get_node(row, col):
+            if (row, col) not in node_map:
+                node_map[(row, col)] = Node(row, col)
+            return node_map[(row, col)]
+
+        start = get_node(start_row, start_col)
+        goal = get_node(goal_row, goal_col)
         start.g = 0
 
         open_set = []
@@ -195,16 +217,17 @@ def run_dijkstra(request):
 
             visited.add((current.row, current.col))
             for neighbor in get_neighbors(current, grid, ROWS, COLS, obstacles):
-                if (neighbor.row, neighbor.col) in visited:
+                n = get_node(neighbor.row, neighbor.col)
+                if (n.row, n.col) in visited:
                     continue
                 temp_g = current.g + 1
-                if temp_g < neighbor.g:
-                    neighbor.g = temp_g
-                    neighbor.parent = current
-                    heapq.heappush(open_set, (neighbor.g, neighbor))
+                if temp_g < n.g:
+                    n.g = temp_g
+                    n.parent = current
+                    heapq.heappush(open_set, (n.g, n))
 
         if found:
-            path = reconstruct_path(current)
+            path = reconstruct_path(goal)
             DijkstraPath.objects.create(
                 user=request.user,
                 start_row=start_row, start_col=start_col,
