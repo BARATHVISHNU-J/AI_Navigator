@@ -1,37 +1,42 @@
-from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import get_user_model
-from django.contrib import messages
-from .models import AStarPath, DijkstraPath
-import csv, heapq, json
-from django import forms
-from django.contrib.auth import logout
-from django.utils import timezone
-from django.views.decorators.http import require_POST
-import datetime
-import os
+# Import Django and Python modules for web, authentication, forms, and utilities
+from django.shortcuts import render, redirect  # For rendering templates and redirects
+from django.http import JsonResponse, HttpResponse  # For JSON and file responses
+from django.contrib.auth.decorators import login_required  # For view protection
+from django.contrib.auth.forms import UserCreationForm  # For user registration forms
+from django.contrib.auth import get_user_model  # For custom user model
+from django.contrib import messages  # For flash messages
+from .models import AStarPath, DijkstraPath  # For path model access
+import csv, heapq, json  # For CSV export, heap queue, and JSON parsing
+from django import forms  # For custom forms
+from django.contrib.auth import logout  # For logging out users
+from django.utils import timezone  # For time-based queries
+from django.views.decorators.http import require_POST  # For POST-only views
+import datetime  # For date/time calculations
+import os  # For environment variable access
 
+# Load admin registration key from environment
 ADMIN_REGISTRATION_KEY = os.environ.get('ADMIN_REGISTRATION_KEY', 'AINAVIGATOR2025')
 
 # ---------- Utilities ----------
+# Node class for pathfinding algorithms (A*, Dijkstra)
 class Node:
     def __init__(self, row, col):
-        self.row = row
-        self.col = col
-        self.g = float("inf")
-        self.f = float("inf")
-        self.parent = None
+        self.row = row  # Row index
+        self.col = col  # Column index
+        self.g = float("inf")  # Cost from start node
+        self.f = float("inf")  # Estimated total cost (A*)
+        self.parent = None  # Parent node for path reconstruction
 
     def __lt__(self, other):
-        return self.f < other.f
+        return self.f < other.f  # For heapq priority queue
 
+# Manhattan distance heuristic for A*
 def heuristic(a, b):
-    return abs(a.row - b.row) + abs(a.col - b.col)    #manhatten heuristics
+    return abs(a.row - b.row) + abs(a.col - b.col)
 
+# Get valid neighbor nodes for a given node
 def get_neighbors(node, grid, ROWS, COLS, obstacles):
-    directions = [(-1,0), (1,0), (0,-1), (0,1)]
+    directions = [(-1,0), (1,0), (0,-1), (0,1)]  # Up, Down, Left, Right
     neighbors = []
     for dr, dc in directions:
         r, c = node.row + dr, node.col + dc
@@ -39,6 +44,7 @@ def get_neighbors(node, grid, ROWS, COLS, obstacles):
             neighbors.append(Node(r, c))
     return neighbors
 
+# Reconstruct path from end node to start node
 def reconstruct_path(end):
     path = []
     current = end
@@ -49,25 +55,30 @@ def reconstruct_path(end):
     return path
 
 # ---------- Forms ----------
+# Get the custom user model
 User = get_user_model()
 
+# User registration form for regular users
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'password1', 'password2')
 
+# Admin registration form with admin key validation
 class AdminRegistrationForm(UserCreationForm):
     admin_key = forms.CharField(label="Admin Key", widget=forms.PasswordInput)
     class Meta:
         model = User
         fields = ('username', 'password1', 'password2', 'admin_key')
 
+    # Validate the admin key from the environment
     def clean_admin_key(self):
         key = self.cleaned_data.get('admin_key')
         if key != ADMIN_REGISTRATION_KEY:
             raise forms.ValidationError("Invalid admin key.")
         return key
 
+    # Save as staff user
     def save(self, commit=True):
         user = super().save(commit=False)
         user.is_staff = True
