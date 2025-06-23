@@ -11,6 +11,9 @@ from django.contrib.auth import logout
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 import datetime
+import os
+
+ADMIN_REGISTRATION_KEY = os.environ.get('ADMIN_REGISTRATION_KEY', 'AINAVIGATOR2025')
 
 # ---------- Utilities ----------
 class Node:
@@ -25,7 +28,7 @@ class Node:
         return self.f < other.f
 
 def heuristic(a, b):
-    return abs(a.row - b.row) + abs(a.col - b.col)
+    return abs(a.row - b.row) + abs(a.col - b.col)    #manhatten heuristics
 
 def get_neighbors(node, grid, ROWS, COLS, obstacles):
     directions = [(-1,0), (1,0), (0,-1), (0,1)]
@@ -61,7 +64,7 @@ class AdminRegistrationForm(UserCreationForm):
 
     def clean_admin_key(self):
         key = self.cleaned_data.get('admin_key')
-        if key != "AINAVIGATOR2025":
+        if key != ADMIN_REGISTRATION_KEY:
             raise forms.ValidationError("Invalid admin key.")
         return key
 
